@@ -5,6 +5,8 @@ from utils import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
+    split_nodes_image,
+    split_nodes_link,
 )
 
 
@@ -292,9 +294,7 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         )
 
     def test_extract_markdown_link_text_beginning_of_text(self):
-        matches = extract_markdown_links(
-            "[link](http://www.google.com/)"
-        )
+        matches = extract_markdown_links("[link](http://www.google.com/)")
 
         self.assertListEqual(
             [
@@ -361,6 +361,147 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             matches,
         )
 
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_node_without_image(self):
+        node = TextNode("just some text", TextType.TEXT)
+        nodes = split_nodes_image([node])
+        self.assertEqual(nodes[0], node)
+
+    def test_no_input(self):
+        self.assertRaises(ValueError, split_nodes_image, None)
+
+    def test_empty_nodes_list(self):
+        nodes = split_nodes_image([])
+        self.assertEqual(nodes, [])
+
+    def test_image_only(self):
+        node = TextNode("![image only](someurl.com/image.png)", TextType.TEXT)
+        nodes = split_nodes_image([node])
+        self.assertEqual(
+            nodes[0], TextNode("image only", TextType.IMAGE, "someurl.com/image.png")
+        )
+
+    def test_multiple_images_only(self):
+        node = TextNode(
+            "![image 1](someurl.com/image1.png)![image 2](someurl.com/image2.png)",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("image 1", TextType.IMAGE, "someurl.com/image1.png"),
+                TextNode("image 2", TextType.IMAGE, "someurl.com/image2.png"),
+            ],
+            nodes,
+        )
+
+    def test_multiple_images_and_text(self):
+        node = TextNode(
+            "Here is an ![image 1](someurl.com/image1.png) and here is another ![image 2](someurl.com/image2.png).",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("Here is an ", TextType.TEXT),
+                TextNode("image 1", TextType.IMAGE, "someurl.com/image1.png"),
+                TextNode(" and here is another ", TextType.TEXT),
+                TextNode("image 2", TextType.IMAGE, "someurl.com/image2.png"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_multiple_images_and_text_with_repeated_images(self):
+        node = TextNode(
+            "Here is an ![image 1](someurl.com/image1.png) and here is another ![image 2](someurl.com/image2.png). Here is the first ![image 1](someurl.com/image1.png).",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("Here is an ", TextType.TEXT),
+                TextNode("image 1", TextType.IMAGE, "someurl.com/image1.png"),
+                TextNode(" and here is another ", TextType.TEXT),
+                TextNode("image 2", TextType.IMAGE, "someurl.com/image2.png"),
+                TextNode(". Here is the first ", TextType.TEXT),
+                TextNode("image 1", TextType.IMAGE, "someurl.com/image1.png"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_node_without_link(self):
+        node = TextNode("just some text", TextType.TEXT)
+        nodes = split_nodes_link([node])
+        self.assertEqual(nodes[0], node)
+
+    def test_no_input(self):
+        self.assertRaises(ValueError, split_nodes_link, None)
+
+    def test_empty_nodes_list(self):
+        nodes = split_nodes_link([])
+        self.assertEqual(nodes, [])
+
+    def test_link_only(self):
+        node = TextNode("[some link](someurl.com/some/article)", TextType.TEXT)
+        nodes = split_nodes_link([node])
+        self.assertEqual(
+            nodes[0], TextNode("some link", TextType.LINK, "someurl.com/some/article")
+        )
+
+    def test_multiple_links_only(self):
+        node = TextNode(
+            "[link 1](someurl.com/example1)[link 2](someurl.com/example2)",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("link 1", TextType.LINK, "someurl.com/example1"),
+                TextNode("link 2", TextType.LINK, "someurl.com/example2"),
+            ],
+            nodes,
+        )
+
+    def test_multiple_links_and_text(self):
+        node = TextNode(
+            "Here is an [link1](someurl.com/somedata/1) and here is another [link2](someurl.com/about.html).",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("Here is an ", TextType.TEXT),
+                TextNode("link1", TextType.LINK, "someurl.com/somedata/1"),
+                TextNode(" and here is another ", TextType.TEXT),
+                TextNode("link2", TextType.LINK, "someurl.com/about.html"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_multiple_links_and_text_with_repeated_link(self):
+        node = TextNode(
+            "Here is an [link 1](someurl.com/test1) and here is another [link 2](someurl.com/test2/). Here is the first [link 1](someurl.com/test1).",
+            TextType.TEXT,
+        )
+        nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("Here is an ", TextType.TEXT),
+                TextNode("link 1", TextType.LINK, "someurl.com/test1"),
+                TextNode(" and here is another ", TextType.TEXT),
+                TextNode("link 2", TextType.LINK, "someurl.com/test2/"),
+                TextNode(". Here is the first ", TextType.TEXT),
+                TextNode("link 1", TextType.LINK, "someurl.com/test1"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
 
 if __name__ == "__main__":
     unittest.main()

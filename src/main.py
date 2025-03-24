@@ -5,23 +5,18 @@ from utils import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
+    split_nodes_image,
+    split_nodes_link
 )
 
 
 def main():
     print("hello")
-    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) and here is ![something] that should not be captured"
-    print(extract_markdown_images(text))
+    node = TextNode("Here is a [link](url.com/some/article).", TextType.TEXT)
+    nodes = split_nodes_link([node])
 
-    text = "This is text with a link [to boot dev](https://www.boot.dev) and x[to youtube](https://www.youtube.com/@bootdotdev) and here is ![some image](url.com) the should not be captured"
-    print(extract_markdown_links(text))
-
-    text = "[link](https://example.com)"
-    print(extract_markdown_links(text))
-
-    text = "![image](https://example.com)"
-    print(extract_markdown_images(text))
-
+    for n in nodes:
+        print(n)
 
 if __name__ == "__main__":
     main()
