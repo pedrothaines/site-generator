@@ -66,4 +66,4 @@ def extract_markdown_links(text):
     if text is None:
         raise ValueError("missing text to extract links from")
 
-    return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text)

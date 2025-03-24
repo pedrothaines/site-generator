@@ -13,8 +13,14 @@ def main():
     text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) and here is ![something] that should not be captured"
     print(extract_markdown_images(text))
 
-    text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) and here is ![some image](url.com) the should not be captured"
+    text = "This is text with a link [to boot dev](https://www.boot.dev) and x[to youtube](https://www.youtube.com/@bootdotdev) and here is ![some image](url.com) the should not be captured"
     print(extract_markdown_links(text))
+
+    text = "[link](https://example.com)"
+    print(extract_markdown_links(text))
+
+    text = "![image](https://example.com)"
+    print(extract_markdown_images(text))
 
 
 if __name__ == "__main__":

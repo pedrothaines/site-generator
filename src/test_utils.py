@@ -291,6 +291,18 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             matches,
         )
 
+    def test_extract_markdown_link_text_beginning_of_text(self):
+        matches = extract_markdown_links(
+            "[link](http://www.google.com/)"
+        )
+
+        self.assertListEqual(
+            [
+                ("link", "http://www.google.com/"),
+            ],
+            matches,
+        )
+
     def test_extract_markdown_link_single(self):
         matches = extract_markdown_links(
             "This is text with an [link](https://www.example.com)"
