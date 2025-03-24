@@ -1,5 +1,7 @@
+import re
 from textnode import TextType, TextNode
 from htmlnode import LeafNode
+
 
 def text_node_to_html_node(text_node):
     match text_node.text_type:
@@ -16,7 +18,10 @@ def text_node_to_html_node(text_node):
         case TextType.IMAGE:
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
-            raise ValueError(f"invalid text node type to convert ({text_node.text_type})")
+            raise ValueError(
+                f"invalid text node type to convert ({text_node.text_type})"
+            )
+
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     if old_nodes is None:
@@ -48,3 +53,17 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                     new_nodes.append(TextNode(s[i], text_type))
 
     return new_nodes
+
+
+def extract_markdown_images(text):
+    if text is None:
+        raise ValueError("missing text to extract images from")
+
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+
+
+def extract_markdown_links(text):
+    if text is None:
+        raise ValueError("missing text to extract links from")
+
+    return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
