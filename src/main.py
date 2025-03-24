@@ -6,17 +6,20 @@ from utils import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_image,
-    split_nodes_link
+    split_nodes_link,
+    text_to_textnodes,
 )
 
 
 def main():
     print("hello")
-    node = TextNode("Here is a [link](url.com/some/article).", TextType.TEXT)
-    nodes = split_nodes_link([node])
+
+    text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    nodes = text_to_textnodes(text)
 
     for n in nodes:
         print(n)
+
 
 if __name__ == "__main__":
     main()

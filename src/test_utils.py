@@ -7,6 +7,7 @@ from utils import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 
@@ -502,6 +503,31 @@ class TestSplitNodesLink(unittest.TestCase):
             ],
             nodes,
         )
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_multi_markdown_string_to_textnodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![example image](https://site.com/image.jpeg) and a [link](https://google.com)"
+        nodes = text_to_textnodes(text)
+
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode(
+                    "example image", TextType.IMAGE, "https://site.com/image.jpeg"
+                ),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://google.com"),
+            ],
+            nodes
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
