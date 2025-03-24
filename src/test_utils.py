@@ -8,6 +8,7 @@ from utils import (
     split_nodes_image,
     split_nodes_link,
     text_to_textnodes,
+    markdown_to_blocks,
 )
 
 
@@ -506,6 +507,13 @@ class TestSplitNodesLink(unittest.TestCase):
 
 
 class TestTextToTextNodes(unittest.TestCase):
+    def test_none_input(self):
+        self.assertRaises(ValueError, text_to_textnodes, None)
+
+    def test_empty_string(self):
+        nodes = text_to_textnodes("")
+        self.assertListEqual([], nodes)
+
     def test_multi_markdown_string_to_textnodes(self):
         text = "This is **text** with an _italic_ word and a `code block` and an ![example image](https://site.com/image.jpeg) and a [link](https://google.com)"
         nodes = text_to_textnodes(text)
@@ -525,7 +533,36 @@ class TestTextToTextNodes(unittest.TestCase):
                 TextNode(" and a ", TextType.TEXT),
                 TextNode("link", TextType.LINK, "https://google.com"),
             ],
-            nodes
+            nodes,
+        )
+
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_none_input(self):
+        self.assertRaises(ValueError, markdown_to_blocks, None)
+
+    def test_empty_string(self):
+        blocks = markdown_to_blocks("")
+        self.assertListEqual([], blocks)
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
         )
 
 

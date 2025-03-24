@@ -150,6 +150,12 @@ def split_nodes_link(old_nodes):
 
 
 def text_to_textnodes(text):
+    if text is None:
+        raise ValueError("missing text (string) to convert to textnodes")
+
+    if text == "":
+        return []
+
     node = TextNode(text, TextType.TEXT)
 
     nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
@@ -159,3 +165,14 @@ def text_to_textnodes(text):
     nodes = split_nodes_link(nodes)
 
     return nodes
+
+
+def markdown_to_blocks(markdown):
+    if markdown is None:
+        raise ValueError("missing markdown (string) to convert to blocks")
+
+    blocks = markdown.split("\n\n")
+    blocks = list(map(lambda b: b.strip(), blocks))
+    blocks = list(filter(lambda b: b != "", blocks))
+
+    return blocks
