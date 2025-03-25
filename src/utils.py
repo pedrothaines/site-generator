@@ -213,7 +213,7 @@ def markdown_to_html_node(markdown):
 
             case BlockType.PARAGRAPH:
                 p = ParentNode("p", children=[])
-                text_nodes = text_to_textnodes(block)
+                text_nodes = text_to_textnodes(block.replace("\n", " "))
                 for text_node in text_nodes:
                     html_node = text_node_to_html_node(text_node)
                     p.children.append(html_node)
@@ -287,7 +287,7 @@ def markdown_to_html_node(markdown):
 
             case BlockType.CODE:
                 p = ParentNode("pre", children=[])
-                code = LeafNode("code", block)
+                code = LeafNode("code", block.replace("```", "").replace("\n", "", 1))
                 p.children.append(code)
 
                 parent_node.children.append(p)
