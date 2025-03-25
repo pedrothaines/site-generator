@@ -201,7 +201,7 @@ def markdown_to_html_node(markdown):
                         heading_level += 1
                     else:
                         break
-                
+
                 p = ParentNode(f"h{heading_level}", children=[])
 
                 text_nodes = text_to_textnodes(block[heading_level:].strip())
@@ -273,7 +273,7 @@ def markdown_to_html_node(markdown):
 
                 for line in block.split("\n"):
                     if line.strip().startswith(">"):
-                        line_text = line.replace(">","",1).strip()
+                        line_text = line.replace(">", "", 1).strip()
                         quote_lines.append(line_text)
 
                 for line in quote_lines:
@@ -282,6 +282,13 @@ def markdown_to_html_node(markdown):
                     for text_node in text_nodes:
                         html_node = text_node_to_html_node(text_node)
                         paragraph.children.append(html_node)
+
+                parent_node.children.append(p)
+
+            case BlockType.CODE:
+                p = ParentNode("pre", children=[])
+                code = LeafNode("code", block)
+                p.children.append(code)
 
                 parent_node.children.append(p)
 

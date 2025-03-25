@@ -36,7 +36,18 @@ And also some tasks:
 Well, what about a quote?
 
 > here is a quote with **bold** and _italic_ text.
-> and we can add a second quote line, like this.
+> and we can add a second quote line with `some inline code`, like this.
+
+And even an entire code block!
+
+```
+#include <stdio.h>
+int main(int argc, char **argv)
+{
+    printf("hello, universe");
+    return 0;
+}
+```
 
 Such a journey...
 """
