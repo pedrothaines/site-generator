@@ -274,7 +274,9 @@ def markdown_to_html_node(markdown):
                 for line in block.split("\n"):
                     if line.strip().startswith(">"):
                         line_text = line.replace(">", "", 1).strip()
-                        quote_lines.append(line_text)
+                        quote_lines.append(line_text + " ")
+
+                quote_lines[-1] = quote_lines[-1].strip()
 
                 for line in quote_lines:
                     text_nodes = text_to_textnodes(line)
