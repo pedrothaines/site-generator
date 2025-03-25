@@ -188,10 +188,7 @@ def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
 
     for block in blocks:
-        print(block)
         block_type = block_to_block_type(block)
-        print(block_type)
-        print()
 
         match block_type:
             case BlockType.HEADING:
@@ -304,7 +301,6 @@ def extract_title(markdown):
         block_type = block_to_block_type(block)
 
         if block_type == BlockType.HEADING:
-            print("found heading, checking if it is h1 (#)")
             if block.startswith("# "):
                 return block[2:].strip()
 
