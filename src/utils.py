@@ -295,3 +295,17 @@ def markdown_to_html_node(markdown):
                 parent_node.children.append(p)
 
     return parent_node
+
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+
+    for block in blocks:
+        block_type = block_to_block_type(block)
+
+        if block_type == BlockType.HEADING:
+            print("found heading, checking if it is h1 (#)")
+            if block.startswith("# "):
+                return block[2:].strip()
+
+    raise Exception("markdown title (h1) not found")

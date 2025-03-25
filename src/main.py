@@ -1,4 +1,7 @@
-import os, shutil
+import os
+import shutil
+
+from utils import extract_title
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -13,6 +16,23 @@ def main():
 
     remove_dir_files(dst_dir)
     copy_contents(dst_dir, src_dir)
+
+    md = """
+# The Writer
+
+This is an interesting history...
+
+Or, is it?
+
+We may have some unordered lists in the way.
+
+- uitem 1
+- uitem 2 with some **bold** text
+
+Bye.
+"""
+    title = extract_title(md)
+    print(title)
 
 
 def remove_dir_files(dir):
