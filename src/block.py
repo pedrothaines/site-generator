@@ -1,5 +1,4 @@
 from enum import Enum
-import re
 
 
 class BlockType(Enum):
@@ -14,7 +13,7 @@ class BlockType(Enum):
 def block_to_block_type(markdown_block):
     lines = markdown_block.split("\n")
 
-    if markdown_block.startswith(("#", "##", "###", "####", "#####", "######")):
+    if markdown_block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
 
     if lines[0].startswith("```") and lines[-1].endswith("```"):
