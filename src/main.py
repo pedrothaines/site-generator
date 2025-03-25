@@ -1,58 +1,58 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode, LeafNode, ParentNode
-from utils import (
-    text_node_to_html_node,
-    split_nodes_delimiter,
-    extract_markdown_images,
-    extract_markdown_links,
-    split_nodes_image,
-    split_nodes_link,
-    text_to_textnodes,
-    markdown_to_blocks,
-    markdown_to_html_node,
-)
+import os, shutil
 
-from block import block_to_block_type
+SCRIPT_DIR = os.path.dirname(__file__)
 
 
 def main():
-    md = """
-# Here is the title with some `inline code` and **bold** and _italic_ text.
+    dst_dir = os.path.join(SCRIPT_DIR, "../public/")
+    src_dir = os.path.join(SCRIPT_DIR, "../static/")
 
-Now a paragraph with **some bold text**.
+    print(f"script_dir..: {SCRIPT_DIR}")
+    print(f"dst_dir.....: {dst_dir}")
+    print(f"src_dir.....: {src_dir}")
 
-Items:
+    remove_dir_files(dst_dir)
+    copy_contents(dst_dir, src_dir)
 
-- item 1
-- item 2 with _italic text_
-- item 3
 
-And also some tasks:
+def remove_dir_files(dir):
+    if not os.path.exists(dir):
+        return
 
-1. first task
-2. second **bold** task
-3. third task with _italic_ word
+    files = list(map(lambda f: os.path.join(dir, f), os.listdir(dir)))
 
-Well, what about a quote?
+    for f in files:
+        if os.path.isfile(f):
+            os.remove(f)
+        elif os.path.isdir(f):
+            remove_dir_files(f)
+            os.rmdir(f)
+        else:
+            raise NotImplementedError("unhandled file type")
 
-> here is a quote with **bold** and _italic_ text.
-> and we can add a second quote line with `some inline code`, like this.
 
-And even an entire code block!
+def copy_contents(dst_dir, src_dir):
+    """Recursive function that copies all the contents from a source directory to a destination directory."""
 
-```
-#include <stdio.h>
-int main(int argc, char **argv)
-{
-    printf("hello, universe");
-    return 0;
-}
-```
+    if not os.path.exists(src_dir):
+        raise FileNotFoundError(f"directory {src_dir} does not exist")
 
-Such a journey...
-"""
-    html = markdown_to_html_node(md)
-    print(html.to_html())
+    if not os.path.exists(dst_dir):
+        os.mkdir(dst_dir)
+
+    files = os.listdir(src_dir)
+
+    for f in files:
+        filepath = os.path.join(src_dir, f)
+
+        if os.path.isfile(filepath):
+            shutil.copy(filepath, dst_dir)
+
+        elif os.path.isdir(filepath):
+            os.mkdir(os.path.join(dst_dir, f))
+            copy_contents(os.path.join(dst_dir, f), filepath)
+        else:
+            raise NotImplementedError("unhandled file type")
 
 
 if __name__ == "__main__":
