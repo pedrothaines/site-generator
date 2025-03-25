@@ -11,10 +11,15 @@ from utils import (
     markdown_to_blocks,
 )
 
+from block import block_to_block_type
 
 def main():
     print("hello")
 
+    md_block = """1. First item
+3. Skipped item (should be 2)
+4. Third item"""
+    print(block_to_block_type(md_block))
 
 if __name__ == "__main__":
     main()
