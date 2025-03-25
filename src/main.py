@@ -17,7 +17,7 @@ from block import block_to_block_type
 
 def main():
     md = """
-# Here is the title.
+# Here is the title with some `inline code` and **bold** and _italic_ text.
 
 Now a paragraph with **some bold text**.
 
@@ -28,8 +28,15 @@ Items:
 - item 3
 
 And also some tasks:
+
 1. first task
-2. second task
+2. second **bold** task
+3. third task with _italic_ word
+
+Well, what about a quote?
+
+> here is a quote with **bold** and _italic_ text.
+> and we can add a second quote line, like this.
 
 Such a journey...
 """

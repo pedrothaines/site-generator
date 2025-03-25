@@ -14,7 +14,7 @@ def text_node_to_html_node(text_node):
         case TextType.ITALIC:
             return LeafNode("i", text_node.text)
         case TextType.CODE:
-            return LeafNode("pre", text_node.text)
+            return LeafNode("code", text_node.text)
         case TextType.LINK:
             return LeafNode("a", text_node.text, {"href": text_node.url})
         case TextType.IMAGE:
@@ -195,7 +195,21 @@ def markdown_to_html_node(markdown):
 
         match block_type:
             case BlockType.HEADING:
-                parent_node.children.append(LeafNode("h1", block.split("#")[1]))
+                heading_level = 0
+                for c in block:
+                    if c == "#":
+                        heading_level += 1
+                    else:
+                        break
+                
+                p = ParentNode(f"h{heading_level}", children=[])
+
+                text_nodes = text_to_textnodes(block[heading_level:].strip())
+                for text_node in text_nodes:
+                    html_node = text_node_to_html_node(text_node)
+                    p.children.append(html_node)
+
+                parent_node.children.append(p)
 
             case BlockType.PARAGRAPH:
                 p = ParentNode("p", children=[])
@@ -225,6 +239,49 @@ def markdown_to_html_node(markdown):
                         parent_item.children.append(html_node)
 
                     p.children.append(parent_item)
+
+                parent_node.children.append(p)
+
+            case BlockType.ORDERED_LIST:
+                p = ParentNode("ol", children=[])
+
+                list_items = []
+
+                for idx, line in enumerate(block.split("\n")):
+                    if line.strip().startswith(f"{idx + 1}. "):
+                        item_text = line.strip()[len(str(idx + 1)) + 2 :]
+                        list_items.append(item_text)
+
+                for item in list_items:
+                    parent_item = ParentNode("li", children=[])
+                    text_nodes = text_to_textnodes(item)
+
+                    for text_node in text_nodes:
+                        html_node = text_node_to_html_node(text_node)
+                        parent_item.children.append(html_node)
+
+                    p.children.append(parent_item)
+
+                parent_node.children.append(p)
+
+            case BlockType.QUOTE:
+                p = ParentNode("blockquote", children=[])
+                paragraph = ParentNode("p", children=[])
+                p.children.append(paragraph)
+
+                quote_lines = []
+
+                for line in block.split("\n"):
+                    if line.strip().startswith(">"):
+                        line_text = line.replace(">","",1).strip()
+                        quote_lines.append(line_text)
+
+                for line in quote_lines:
+                    text_nodes = text_to_textnodes(line)
+
+                    for text_node in text_nodes:
+                        html_node = text_node_to_html_node(text_node)
+                        paragraph.children.append(html_node)
 
                 parent_node.children.append(p)
 
