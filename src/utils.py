@@ -1,6 +1,8 @@
 import re
 from textnode import TextType, TextNode
 from htmlnode import LeafNode
+from block import BlockType, block_to_block_type
+from htmlnode import HTMLNode, ParentNode, LeafNode
 
 
 def text_node_to_html_node(text_node):
@@ -176,3 +178,54 @@ def markdown_to_blocks(markdown):
     blocks = list(filter(lambda b: b != "", blocks))
 
     return blocks
+
+
+def markdown_to_html_node(markdown):
+    """Convert a full markdown document to a single parent HTMLNode."""
+
+    parent_node = ParentNode("div", children=[])
+
+    blocks = markdown_to_blocks(markdown)
+
+    for block in blocks:
+        print(block)
+        block_type = block_to_block_type(block)
+        print(block_type)
+        print()
+
+        match block_type:
+            case BlockType.HEADING:
+                parent_node.children.append(LeafNode("h1", block.split("#")[1]))
+
+            case BlockType.PARAGRAPH:
+                p = ParentNode("p", children=[])
+                text_nodes = text_to_textnodes(block)
+                for text_node in text_nodes:
+                    html_node = text_node_to_html_node(text_node)
+                    p.children.append(html_node)
+
+                parent_node.children.append(p)
+
+            case BlockType.UNORDERED_LIST:
+                p = ParentNode("ul", children=[])
+
+                list_items = []
+
+                for line in block.split("\n"):
+                    if line.strip().startswith("- "):
+                        item_text = line.strip()[2:]
+                        list_items.append(item_text)
+
+                for item in list_items:
+                    parent_item = ParentNode("li", children=[])
+                    text_nodes = text_to_textnodes(item)
+
+                    for text_node in text_nodes:
+                        html_node = text_node_to_html_node(text_node)
+                        parent_item.children.append(html_node)
+
+                    p.children.append(parent_item)
+
+                parent_node.children.append(p)
+
+    return parent_node
