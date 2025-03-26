@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from utils import extract_title, markdown_to_html_node
 
@@ -7,7 +8,14 @@ SCRIPT_DIR = os.path.dirname(__file__)
 
 
 def main():
-    dst_dir = os.path.join(SCRIPT_DIR, "../public/")
+    basepath = "/"
+
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+
+    print(f"basepath....: {basepath}")
+
+    dst_dir = os.path.join(SCRIPT_DIR, "../docs/")
     src_dir = os.path.join(SCRIPT_DIR, "../static/")
 
     print(f"script_dir..: {SCRIPT_DIR}")
@@ -19,12 +27,14 @@ def main():
 
     template_filepath = os.path.join(SCRIPT_DIR, "../template.html")
     content_dir = os.path.join(SCRIPT_DIR, "../content/")
-    public_dir = os.path.join(SCRIPT_DIR, "../public/")
+    public_dir = os.path.join(SCRIPT_DIR, "../docs/")
 
-    generate_pages_recursive(content_dir, template_filepath, public_dir)
+    generate_pages_recursive(content_dir, template_filepath, public_dir, basepath)
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(
+    dir_path_content, template_path, dest_dir_path, basepath="/"
+):
     if not os.path.exists(dest_dir_path):
         os.mkdir(dest_dir_path)
 
@@ -35,11 +45,22 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
 
         if os.path.isfile(filepath):
             if file.endswith(".md"):
-                generate_page(filepath, template_path, os.path.join(dest_dir_path, file.replace(".md", ".html")))
+                generate_page(
+                    filepath,
+                    template_path,
+                    os.path.join(dest_dir_path, file.replace(".md", ".html")),
+                    basepath,
+                )
         elif os.path.isdir(filepath):
-            generate_pages_recursive(filepath, template_path, os.path.join(dest_dir_path, file))
+            generate_pages_recursive(
+                filepath,
+                template_path,
+                os.path.join(dest_dir_path, file),
+                basepath,
+            )
 
-def generate_page(from_path, template_path, dest_path):
+
+def generate_page(from_path, template_path, dest_path, basepath="/"):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     md_file = open(from_path, "r")
@@ -56,6 +77,8 @@ def generate_page(from_path, template_path, dest_path):
 
     template_content = template_content.replace("{{ Title }}", title, 1)
     template_content = template_content.replace("{{ Content }}", html_content)
+    template_content = template_content.replace('href="/', f'href="{basepath}')
+    template_content = template_content.replace('src="/', f'src="{basepath}')
 
     dir = os.path.dirname(dest_path)
     os.makedirs(dir, exist_ok=True)
