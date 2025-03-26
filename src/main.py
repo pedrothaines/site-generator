@@ -17,12 +17,27 @@ def main():
     remove_dir_files(dst_dir)
     copy_contents(dst_dir, src_dir)
 
-    md_filepath = os.path.join(SCRIPT_DIR, "../content/index.md")
     template_filepath = os.path.join(SCRIPT_DIR, "../template.html")
-    html_filepath = os.path.join(SCRIPT_DIR, "../public/index.html")
+    content_dir = os.path.join(SCRIPT_DIR, "../content/")
+    public_dir = os.path.join(SCRIPT_DIR, "../public/")
 
-    generate_page(md_filepath, template_filepath, html_filepath)
+    generate_pages_recursive(content_dir, template_filepath, public_dir)
 
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dest_dir_path):
+        os.mkdir(dest_dir_path)
+
+    content_files = os.listdir(dir_path_content)
+
+    for file in content_files:
+        filepath = os.path.join(dir_path_content, file)
+
+        if os.path.isfile(filepath):
+            if file.endswith(".md"):
+                generate_page(filepath, template_path, os.path.join(dest_dir_path, file.replace(".md", ".html")))
+        elif os.path.isdir(filepath):
+            generate_pages_recursive(filepath, template_path, os.path.join(dest_dir_path, file))
 
 def generate_page(from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
