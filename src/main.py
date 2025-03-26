@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from utils import extract_title
+from utils import extract_title, markdown_to_html_node
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -17,22 +17,37 @@ def main():
     remove_dir_files(dst_dir)
     copy_contents(dst_dir, src_dir)
 
-    md = """
-# The Writer
+    md_filepath = os.path.join(SCRIPT_DIR, "../content/index.md")
+    template_filepath = os.path.join(SCRIPT_DIR, "../template.html")
+    html_filepath = os.path.join(SCRIPT_DIR, "../public/index.html")
 
-This is an interesting history...
+    generate_page(md_filepath, template_filepath, html_filepath)
 
-Or, is it?
 
-We may have some unordered lists in the way.
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
-- uitem 1
-- uitem 2 with some **bold** text
+    md_file = open(from_path, "r")
+    md_content = md_file.read()
+    md_file.close()
 
-Bye.
-"""
-    title = extract_title(md)
-    print(title)
+    template_file = open(template_path, "r")
+    template_content = template_file.read()
+    template_file.close()
+
+    html_content = markdown_to_html_node(md_content).to_html()
+
+    title = extract_title(md_content)
+
+    template_content = template_content.replace("{{ Title }}", title, 1)
+    template_content = template_content.replace("{{ Content }}", html_content)
+
+    dir = os.path.dirname(dest_path)
+    os.makedirs(dir, exist_ok=True)
+
+    html_file = open(dest_path, "w")
+    html_file.write(template_content)
+    html_file.close()
 
 
 def remove_dir_files(dir):
@@ -69,7 +84,6 @@ def copy_contents(dst_dir, src_dir):
             shutil.copy(filepath, dst_dir)
 
         elif os.path.isdir(filepath):
-            os.mkdir(os.path.join(dst_dir, f))
             copy_contents(os.path.join(dst_dir, f), filepath)
         else:
             raise NotImplementedError("unhandled file type")

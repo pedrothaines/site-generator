@@ -263,8 +263,8 @@ def markdown_to_html_node(markdown):
 
             case BlockType.QUOTE:
                 p = ParentNode("blockquote", children=[])
-                paragraph = ParentNode("p", children=[])
-                p.children.append(paragraph)
+                # paragraph = ParentNode("p", children=[])
+                # p.children.append(paragraph)
 
                 quote_lines = []
 
@@ -280,7 +280,8 @@ def markdown_to_html_node(markdown):
 
                     for text_node in text_nodes:
                         html_node = text_node_to_html_node(text_node)
-                        paragraph.children.append(html_node)
+                        # paragraph.children.append(html_node)
+                        p.children.append(html_node)
 
                 parent_node.children.append(p)
 
